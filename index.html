@@ -361,6 +361,30 @@
   font-size: 18px;
 }
 
+.soom-disclaimer {
+  background: rgba(255, 193, 7, 0.05);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  font-size: 13px;
+  color: #a8b2d1;
+  line-height: 1.6;
+}
+
+.soom-disclaimer p {
+  margin: 0 0 10px 0;
+}
+
+.soom-disclaimer p:last-child {
+  margin: 0;
+}
+
+.soom-disclaimer strong {
+  color: #ffc107;
+  font-weight: 600;
+}
+
 @media (max-width: 600px) {
   .soom-calc {
     border-radius: 0;
@@ -723,13 +747,18 @@ function calculate() {
     allocations[botId] = (botWeights[botId] / 100) * capital;
   });
   
-  // Calculate portfolio stats
+  // Calculate portfolio stats (annualized to 1 year)
   let portfolioReturn = 0;
   let portfolioDD = 0;
   bots.forEach(botId => {
     const bot = botData[botId];
     const weight = botWeights[botId] / 100;
-    portfolioReturn += bot.ret * weight;
+    
+    // Convert total return to annualized (CAGR)
+    const years = bot.years;
+    const annualizedReturn = (Math.pow(1 + bot.ret / 100, 1 / years) - 1) * 100;
+    
+    portfolioReturn += annualizedReturn * weight;
     portfolioDD += bot.dd * weight;
   });
   
@@ -751,6 +780,9 @@ function calculate() {
     const amount = allocations[botId];
     const percentage = (amount / capital) * 100;
     
+    // Calculate annualized return for this bot
+    const annualizedReturn = (Math.pow(1 + bot.ret / 100, 1 / bot.years) - 1) * 100;
+    
     html += `
       <div class="soom-bot-card">
         <div class="soom-bot-header">
@@ -760,7 +792,7 @@ function calculate() {
         <div class="soom-bot-details">
           <span class="soom-risk-badge risk-${bot.risk}">${bot.risk}</span>
           <span>${percentage.toFixed(1)}% allocation</span>
-          <span>📈 ${bot.ret.toFixed(1)}% return</span>
+          <span>📈 ${annualizedReturn.toFixed(1)}%/yr</span>
           <span>📉 -${bot.dd.toFixed(1)}% DD</span>
           <span>⏱️ ${bot.years}yr history</span>
         </div>
@@ -787,11 +819,11 @@ function calculate() {
         <span>$${config.cost}</span>
       </div>
       <div class="soom-summary-row">
-        <span>Portfolio Return:</span>
+        <span>Annualized Return (1yr):</span>
         <span>${portfolioReturn.toFixed(1)}%</span>
       </div>
       <div class="soom-summary-row">
-        <span>Portfolio DD:</span>
+        <span>Max Drawdown:</span>
         <span>-${portfolioDD.toFixed(1)}%</span>
       </div>
       ${reserveRow}
@@ -799,6 +831,12 @@ function calculate() {
         <span>Total Investment:</span>
         <span>$${amt.toFixed(2)}</span>
       </div>
+    </div>
+    
+    <div class="soom-disclaimer">
+      <p><strong>⚠️ Important Disclosure:</strong></p>
+      <p>Portfolio returns and drawdowns shown are based on historical backtests over varying time periods (0.75 to 5.2 years depending on bot). Returns are annualized to a 1-year period for comparison purposes.</p>
+      <p><strong>Past performance does not guarantee future results.</strong> Cryptocurrency trading involves substantial risk of loss. Only invest capital you can afford to lose.</p>
     </div>
   `;
   
