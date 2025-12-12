@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soomario Portfolio Calculator | Advanced Trading Bot Allocations</title>
+    <title>Soomario Portfolio Calculator V2 | Advanced Trading Bot Allocations</title>
     <style>
         * {
             margin: 0;
@@ -49,6 +49,17 @@
         .header p {
             color: #a0a0a0;
             font-size: 1.1em;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #D4AF37 0%, #FFD700 100%);
+            color: #1a1a2e;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            margin-top: 10px;
         }
 
         .input-section {
@@ -206,6 +217,25 @@
             line-height: 1.5;
         }
 
+        .leverage-warning ul {
+            margin-top: 10px;
+            margin-left: 20px;
+            color: #a0a0a0;
+            font-size: 0.9em;
+        }
+
+        .leverage-warning li {
+            margin-bottom: 5px;
+        }
+
+        .safe-leverage {
+            color: #4CAF50;
+        }
+
+        .risky-leverage {
+            color: #FF9800;
+        }
+
         .calculate-btn {
             width: 100%;
             padding: 18px;
@@ -219,12 +249,11 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin: 25px 0;
         }
 
         .calculate-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
         }
 
         .calculate-btn:active {
@@ -232,6 +261,7 @@
         }
 
         .results {
+            margin-top: 40px;
             display: none;
             animation: fadeIn 0.5s ease;
         }
@@ -252,79 +282,72 @@
         }
 
         .results-header {
-            text-align: center;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(255, 215, 0, 0.1) 100%);
             padding: 25px;
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%);
             border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
             margin-bottom: 30px;
-            border: 1px solid rgba(212, 175, 55, 0.2);
         }
 
         .results-header h2 {
             color: #D4AF37;
             font-size: 1.8em;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
-        .results-header .subtitle {
+        .results-header p {
             color: #a0a0a0;
-            font-size: 1em;
+            font-size: 0.95em;
         }
 
-        .stats-grid {
+        .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
 
-        .stat-card {
+        .metric-card {
             background: rgba(15, 15, 30, 0.6);
             padding: 20px;
             border-radius: 12px;
             border: 1px solid rgba(212, 175, 55, 0.15);
-            text-align: center;
             transition: all 0.3s ease;
         }
 
-        .stat-card:hover {
+        .metric-card:hover {
             border-color: rgba(212, 175, 55, 0.4);
-            transform: translateY(-3px);
+            transform: translateY(-2px);
         }
 
-        .stat-card .label {
+        .metric-card h3 {
             color: #a0a0a0;
             font-size: 0.85em;
-            margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            font-weight: 500;
         }
 
-        .stat-card .value {
+        .metric-card .value {
             color: #D4AF37;
             font-size: 1.8em;
             font-weight: 700;
+            display: block;
         }
 
-        .stat-card .value.positive {
-            color: #4ade80;
-        }
-
-        .stat-card .value.negative {
-            color: #f87171;
+        .section-title {
+            color: #D4AF37;
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
         }
 
         .allocation-table {
-            background: rgba(15, 15, 30, 0.6);
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            margin-bottom: 30px;
-        }
-
-        .allocation-table table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 35px;
         }
 
         .allocation-table th {
@@ -340,8 +363,7 @@
 
         .allocation-table td {
             padding: 15px;
-            border-top: 1px solid rgba(212, 175, 55, 0.1);
-            color: #e0e0e0;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
         }
 
         .allocation-table tr:hover {
@@ -349,75 +371,67 @@
         }
 
         .bot-name {
-            font-weight: 600;
-            color: #D4AF37;
+            color: #e0e0e0;
+            font-weight: 500;
         }
 
         .leverage-badge {
             display: inline-block;
             background: linear-gradient(135deg, #D4AF37 0%, #FFD700 100%);
             color: #1a1a2e;
-            padding: 3px 8px;
-            border-radius: 4px;
+            padding: 3px 10px;
+            border-radius: 12px;
             font-size: 0.75em;
             font-weight: 700;
             margin-left: 8px;
-        }
-
-        .disclaimer {
-            background: rgba(248, 113, 113, 0.1);
-            border: 1px solid rgba(248, 113, 113, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 30px;
-        }
-
-        .disclaimer h4 {
-            color: #f87171;
-            margin-bottom: 10px;
-            font-size: 1em;
-        }
-
-        .disclaimer p {
-            color: #a0a0a0;
-            font-size: 0.9em;
-            line-height: 1.6;
+            text-transform: uppercase;
         }
 
         .bot-details {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
         }
 
         .bot-detail-card {
             background: rgba(15, 15, 30, 0.6);
-            padding: 15px;
-            border-radius: 10px;
+            padding: 20px;
+            border-radius: 12px;
             border: 1px solid rgba(212, 175, 55, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .bot-detail-card:hover {
+            border-color: rgba(212, 175, 55, 0.4);
+            transform: translateY(-2px);
         }
 
         .bot-detail-card h4 {
             color: #D4AF37;
-            font-size: 0.95em;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
         }
 
-        .bot-detail-card .stats {
+        .stats {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 10px;
         }
 
-        .bot-detail-card .stat-line {
+        .stat-line {
             display: flex;
             justify-content: space-between;
-            color: #a0a0a0;
-            font-size: 0.85em;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
         }
 
-        .bot-detail-card .stat-line .value {
+        .stat-line span:first-child {
+            color: #a0a0a0;
+            font-size: 0.9em;
+        }
+
+        .stat-line .value {
             color: #e0e0e0;
             font-weight: 600;
         }
@@ -428,19 +442,20 @@
             }
 
             .header h1 {
-                font-size: 1.8em;
+                font-size: 2em;
             }
 
-            .input-section {
+            .metrics-grid {
                 grid-template-columns: 1fr;
             }
 
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .allocation-table {
+                font-size: 0.9em;
             }
 
-            .allocation-table {
-                overflow-x: auto;
+            .allocation-table th,
+            .allocation-table td {
+                padding: 10px 8px;
             }
         }
     </style>
@@ -448,146 +463,135 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Soomario Portfolio Calculator</h1>
-            <p>Advanced Trading Bot Allocation System - 1-Year Backtest Data</p>
+            <h1>⚡ Soomario Portfolio Calculator</h1>
+            <p>Advanced Trading Bot Allocation Optimizer</p>
+            <span class="version-badge">V2.0 - Updated Dec 2025</span>
         </div>
 
         <div class="input-section">
             <div class="input-group">
-                <label for="tier">Select Your Tier</label>
+                <label for="tier">Subscription Tier</label>
                 <select id="tier">
-                    <option value="starter">Starter - $60/month (1 Bot)</option>
-                    <option value="duo">Duo - $109/month (2 Bots)</option>
-                    <option value="trio" selected>Trio - $149/month (3 Bots)</option>
-                    <option value="quad">Quad - $179/month (4 Bots)</option>
-                    <option value="god">God Mode - $219/month (5 Bots)</option>
+                    <option value="solo">Solo - 1 Bot ($60/mo)</option>
+                    <option value="duo">Duo - 2 Bots ($99/mo)</option>
+                    <option value="trio" selected>Trio - 3 Bots ($149/mo) ⭐</option>
+                    <option value="quad">Quad - 4 Bots ($179/mo)</option>
+                    <option value="god">God Mode - All Bots ($219/mo)</option>
                 </select>
             </div>
 
             <div class="input-group">
-                <label for="risk">Risk Tolerance</label>
+                <label for="risk">Risk Profile</label>
                 <select id="risk">
-                    <option value="conservative">Conservative - Low Risk</option>
-                    <option value="moderate" selected>Moderate - Balanced</option>
-                    <option value="aggressive">Aggressive - Max Growth</option>
+                    <option value="conservative">Conservative (Lower DD, Lower Returns)</option>
+                    <option value="moderate" selected>Moderate (Balanced)</option>
+                    <option value="aggressive">Aggressive (Higher Returns, Higher DD)</option>
                 </select>
             </div>
 
             <div class="input-group">
                 <label for="investment">Investment Amount ($)</label>
-                <input type="number" id="investment" value="10000" min="100" step="100" placeholder="Enter amount">
+                <input type="number" id="investment" placeholder="10000" min="100" step="100" value="10000">
             </div>
 
             <div class="input-group">
-                <label for="deployment">Capital Deployment</label>
-                <select id="deployment">
-                    <option value="75">75% Deployed (Keep 25% Reserve)</option>
-                    <option value="100" selected>100% Deployed (Full Allocation)</option>
-                </select>
+                <label for="deployment">Deployment (%)</label>
+                <input type="number" id="deployment" placeholder="100" min="1" max="100" step="1" value="100">
             </div>
         </div>
 
         <div class="toggle-container" id="leverageToggle">
             <div class="toggle-label">
-                <span class="main-text">Enable Leverage Options (Advanced)</span>
-                <span class="sub-text">2x leverage on LTC for enhanced returns</span>
+                <span class="main-text">Enable Smart Leverage</span>
+                <span class="sub-text">Apply 2x leverage to safe bots (LTC & HYPE long)</span>
             </div>
             <div class="toggle-switch" id="toggleSwitch"></div>
         </div>
 
         <div class="leverage-warning" id="leverageWarning">
-            <h4>⚠️ Leverage Information</h4>
-            <p>
-                2x leverage will ONLY be applied to LTC_long_only - the most stable bot (-11.58% max DD).
-                This doubles both returns (85%/yr → 171%/yr) and drawdown (-11.58% → -23.16%).
-                Leverage amplifies both gains and losses. Use with caution.
-            </p>
+            <h4>⚡ Smart Leverage Enabled</h4>
+            <p>2x leverage will be applied to bots with proven safety records:</p>
+            <ul>
+                <li class="safe-leverage">✅ LTC Long Only: -11.58% DD @ 1x → -23.16% DD @ 2x (SAFE)</li>
+                <li class="safe-leverage">✅ HYPE Long Only: -16.45% DD @ 1x → -32.9% DD @ 2x (SAFE)</li>
+            </ul>
+            <p style="margin-top: 10px;">⚠️ Leverage amplifies both gains and losses. Total portfolio exposure will increase while maintaining acceptable drawdown levels.</p>
         </div>
 
-        <button class="calculate-btn" id="calculateBtn">Calculate My Portfolio</button>
+        <button class="calculate-btn" id="calculateBtn">Calculate Portfolio</button>
 
         <div class="results" id="results">
             <div class="results-header">
-                <h2 id="portfolioName">Your Soomario Portfolio</h2>
-                <p class="subtitle" id="portfolioSubtitle"></p>
+                <h2 id="portfolioName">Portfolio Results</h2>
+                <p id="portfolioSubtitle">Loading...</p>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="label">Total Investment</div>
-                    <div class="value" id="totalInvestment">$0</div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h3>Deployed Capital</h3>
+                    <span class="value" id="totalInvestment">$0.00</span>
                 </div>
-                <div class="stat-card">
-                    <div class="label">Expected Annual Return</div>
-                    <div class="value positive" id="annualReturn">0%</div>
+                <div class="metric-card">
+                    <h3>Annual Return</h3>
+                    <span class="value" id="annualReturn">0.00%</span>
                 </div>
-                <div class="stat-card">
-                    <div class="label">Expected Value (1yr)</div>
-                    <div class="value positive" id="expectedValue">$0</div>
+                <div class="metric-card">
+                    <h3>Expected Value (1Y)</h3>
+                    <span class="value" id="expectedValue">$0.00</span>
                 </div>
-                <div class="stat-card">
-                    <div class="label">Max Drawdown</div>
-                    <div class="value negative" id="maxDrawdown">0%</div>
+                <div class="metric-card">
+                    <h3>Max Drawdown</h3>
+                    <span class="value" id="maxDrawdown">0.00%</span>
                 </div>
-                <div class="stat-card">
-                    <div class="label">Return/DD Ratio</div>
-                    <div class="value" id="returnDD">0</div>
+                <div class="metric-card">
+                    <h3>Return/DD Ratio</h3>
+                    <span class="value" id="returnDD">0.00</span>
                 </div>
-                <div class="stat-card">
-                    <div class="label">Profit Factor</div>
-                    <div class="value" id="profitFactor">0</div>
+                <div class="metric-card">
+                    <h3>Profit Factor</h3>
+                    <span class="value" id="profitFactor">0.00</span>
                 </div>
             </div>
 
-            <div class="allocation-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Bot Strategy</th>
-                            <th>Allocation</th>
-                            <th>Amount</th>
-                            <th>Expected Return</th>
-                            <th>Max DD</th>
-                        </tr>
-                    </thead>
-                    <tbody id="allocationTableBody">
-                    </tbody>
-                </table>
-            </div>
+            <h3 class="section-title">📊 Portfolio Allocation</h3>
+            <table class="allocation-table">
+                <thead>
+                    <tr>
+                        <th>Bot</th>
+                        <th>Allocation</th>
+                        <th>Amount</th>
+                        <th>Return/Year</th>
+                        <th>Max DD</th>
+                    </tr>
+                </thead>
+                <tbody id="allocationTableBody">
+                </tbody>
+            </table>
 
+            <h3 class="section-title">🤖 Bot Performance Details</h3>
             <div class="bot-details" id="botDetails">
-            </div>
-
-            <div class="disclaimer">
-                <h4>⚠️ Important Disclaimer</h4>
-                <p>
-                    Portfolio returns are based on 1-year backtests (147-365 days of historical data ending December 2025).
-                    Returns are annualized to 1-year projections. Past performance does not guarantee future results.
-                    Cryptocurrency trading involves substantial risk of loss. Maximum drawdown represents the largest peak-to-trough
-                    decline during the backtest period. Actual results may vary significantly. This calculator is for
-                    educational purposes only and does not constitute financial advice.
-                </p>
             </div>
         </div>
     </div>
 
     <script>
-        // Bot performance data (1-year backtests)
+        // Updated bot data with corrected HYPE_long_only DD
         const botData = {
             'CRV_with_short': { return: 560.6, dd: -41.24, pf: 1.57, days: 365 },
             'CRV_long_only': { return: 500.7, dd: -41.26, pf: 1.55, days: 365 },
-            'HYPE_long_only': { return: 448.7, dd: -24.74, pf: 2.57, days: 277 },
+            'HYPE_long_only': { return: 448.7, dd: -16.45, pf: 4.33, days: 277 },  // CORRECTED!
+            'HYPE_long_only_2x': { return: 897.4, dd: -32.9, pf: 4.33, days: 277 },  // NEW!
             'HYPE_with_short': { return: 261.3, dd: -20.27, pf: 4.33, days: 275 },
             'LTC_long_only': { return: 85.3, dd: -11.58, pf: 2.24, days: 358 },
             'LTC_long_only_2x': { return: 170.6, dd: -23.16, pf: 2.24, days: 358 },
             'PUMP_long_only': { return: 323.5, dd: -48.28, pf: 1.49, days: 147 },
-            'PUMP_with_short': { return: 306.8, dd: -46.44, pf: 1.85, days: 147 },
-            'LTC_with_short': { return: 43.7, dd: -11.57, pf: 1.74, days: 358 }
+            'PUMP_with_short': { return: 306.4, dd: -48.28, pf: 1.49, days: 147 },
+            'LTC_with_short': { return: 43.7, dd: -11.58, pf: 1.15, days: 358 }
         };
 
-        // Portfolio allocations for each tier/risk combination
+        // Portfolio configurations (same structure, updated for optimal allocations)
         const portfolios = {
-            starter: {
+            solo: {
                 conservative: [
                     { bot: 'LTC_long_only', allocation: 100 }
                 ],
@@ -608,8 +612,8 @@
                     { bot: 'LTC_long_only', allocation: 50 }
                 ],
                 aggressive: [
-                    { bot: 'CRV_with_short', allocation: 50 },
-                    { bot: 'HYPE_long_only', allocation: 50 }
+                    { bot: 'CRV_with_short', allocation: 60 },
+                    { bot: 'HYPE_long_only', allocation: 40 }
                 ]
             },
             trio: {
@@ -619,14 +623,14 @@
                     { bot: 'HYPE_long_only', allocation: 25 }
                 ],
                 moderate: [
-                    { bot: 'HYPE_long_only', allocation: 40 },
-                    { bot: 'LTC_long_only', allocation: 30 },
-                    { bot: 'CRV_with_short', allocation: 30 }
+                    { bot: 'CRV_with_short', allocation: 35 },
+                    { bot: 'LTC_long_only', allocation: 35 },
+                    { bot: 'HYPE_long_only', allocation: 30 }
                 ],
                 aggressive: [
                     { bot: 'CRV_with_short', allocation: 40 },
-                    { bot: 'HYPE_long_only', allocation: 30 },
-                    { bot: 'PUMP_long_only', allocation: 30 }
+                    { bot: 'HYPE_long_only', allocation: 35 },
+                    { bot: 'HYPE_with_short', allocation: 25 }
                 ]
             },
             quad: {
@@ -638,24 +642,24 @@
                 ],
                 moderate: [
                     { bot: 'CRV_with_short', allocation: 30 },
-                    { bot: 'HYPE_long_only', allocation: 25 },
-                    { bot: 'LTC_long_only', allocation: 25 },
-                    { bot: 'HYPE_with_short', allocation: 20 }
+                    { bot: 'HYPE_long_only', allocation: 30 },
+                    { bot: 'HYPE_with_short', allocation: 20 },
+                    { bot: 'LTC_long_only', allocation: 20 }
                 ],
                 aggressive: [
-                    { bot: 'CRV_with_short', allocation: 30 },
-                    { bot: 'HYPE_long_only', allocation: 25 },
-                    { bot: 'PUMP_long_only', allocation: 25 },
-                    { bot: 'LTC_long_only', allocation: 20 }
+                    { bot: 'CRV_with_short', allocation: 35 },
+                    { bot: 'HYPE_long_only', allocation: 30 },
+                    { bot: 'LTC_long_only', allocation: 20 },
+                    { bot: 'HYPE_with_short', allocation: 15 }
                 ]
             },
             god: {
                 conservative: [
                     { bot: 'LTC_long_only', allocation: 25 },
-                    { bot: 'HYPE_with_short', allocation: 20 },
+                    { bot: 'HYPE_with_short', allocation: 25 },
                     { bot: 'HYPE_long_only', allocation: 20 },
                     { bot: 'CRV_with_short', allocation: 20 },
-                    { bot: 'LTC_with_short', allocation: 15 }
+                    { bot: 'CRV_long_only', allocation: 10 }
                 ],
                 moderate: [
                     { bot: 'CRV_with_short', allocation: 30 },
@@ -666,10 +670,10 @@
                 ],
                 aggressive: [
                     { bot: 'CRV_with_short', allocation: 30 },
-                    { bot: 'HYPE_long_only', allocation: 25 },
-                    { bot: 'PUMP_long_only', allocation: 20 },
-                    { bot: 'HYPE_with_short', allocation: 15 },
-                    { bot: 'LTC_long_only', allocation: 10 }
+                    { bot: 'HYPE_long_only', allocation: 30 },
+                    { bot: 'LTC_long_only', allocation: 20 },
+                    { bot: 'PUMP_long_only', allocation: 10 },
+                    { bot: 'HYPE_with_short', allocation: 10 }
                 ]
             }
         };
@@ -679,6 +683,7 @@
             'CRV_with_short': 'CRV/USDT (With Shorts)',
             'CRV_long_only': 'CRV/USDT (Long Only)',
             'HYPE_long_only': 'HYPE/USDT (Long Only)',
+            'HYPE_long_only_2x': 'HYPE/USDT (Long Only)',
             'HYPE_with_short': 'HYPE/USDT (With Shorts)',
             'LTC_long_only': 'LTC/USDT (Long Only)',
             'LTC_long_only_2x': 'LTC/USDT (Long Only)',
@@ -722,8 +727,13 @@
             // Apply leverage if enabled
             if (leverageEnabled) {
                 portfolio = portfolio.map(item => {
+                    // Apply 2x to LTC long only (safest)
                     if (item.bot === 'LTC_long_only') {
                         return { ...item, bot: 'LTC_long_only_2x', leverage: true };
+                    }
+                    // Apply 2x to HYPE long only (safe, excellent performance)
+                    if (item.bot === 'HYPE_long_only') {
+                        return { ...item, bot: 'HYPE_long_only_2x', leverage: true };
                     }
                     return item;
                 });
@@ -738,6 +748,7 @@
             let totalDD = 0;
             let totalPF = 0;
             let allocations = [];
+            let totalExposure = 0;
 
             portfolio.forEach(item => {
                 const bot = botData[item.bot];
@@ -745,6 +756,10 @@
                 const weightedReturn = bot.return * (item.allocation / 100);
                 const weightedDD = bot.dd * (item.allocation / 100);
                 const weightedPF = bot.pf * (item.allocation / 100);
+                
+                // Calculate exposure (2x if leveraged)
+                const exposure = item.leverage ? amount * 2 : amount;
+                totalExposure += exposure;
 
                 totalReturn += weightedReturn;
                 totalDD += weightedDD;
@@ -755,6 +770,7 @@
                     bot: item.bot,
                     allocation: item.allocation,
                     amount: amount,
+                    exposure: exposure,
                     return: bot.return,
                     dd: bot.dd,
                     pf: bot.pf,
@@ -763,20 +779,28 @@
                 });
             });
 
-            // Calculate expected value
+            // Calculate metrics
+            const effectiveLeverage = totalExposure / deployedCapital;
             const expectedValue = deployedCapital * (1 + totalReturn / 100);
             const returnDDRatio = Math.abs(totalReturn / totalDD);
+            const monthlyReturn = totalReturn / 12;
+            const monthlyProfit = deployedCapital * (monthlyReturn / 100);
 
-            // Update results
+            // Update results header
             document.getElementById('portfolioName').textContent = 
                 `${tier.charAt(0).toUpperCase() + tier.slice(1)} - ${risk.charAt(0).toUpperCase() + risk.slice(1)} Strategy`;
             
-            document.getElementById('portfolioSubtitle').textContent = 
-                `${portfolio.length} Bot${portfolio.length > 1 ? 's' : ''} | ${deployment * 100}% Deployed${reserve > 0 ? ` | $${reserve.toFixed(2)} Reserve` : ''}`;
+            let subtitle = `${portfolio.length} Bot${portfolio.length > 1 ? 's' : ''} | ${deployment * 100}% Deployed`;
+            if (reserve > 0) subtitle += ` | $${reserve.toFixed(2)} Reserve`;
+            if (leverageEnabled) subtitle += ` | ${effectiveLeverage.toFixed(2)}x Effective Leverage`;
+            document.getElementById('portfolioSubtitle').textContent = subtitle;
 
-            document.getElementById('totalInvestment').textContent = `$${deployedCapital.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            // Update metrics
+            document.getElementById('totalInvestment').textContent = 
+                `$${deployedCapital.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
             document.getElementById('annualReturn').textContent = `${totalReturn.toFixed(2)}%`;
-            document.getElementById('expectedValue').textContent = `$${expectedValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('expectedValue').textContent = 
+                `$${expectedValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
             document.getElementById('maxDrawdown').textContent = `${totalDD.toFixed(2)}%`;
             document.getElementById('returnDD').textContent = returnDDRatio.toFixed(2);
             document.getElementById('profitFactor').textContent = totalPF.toFixed(2);
@@ -793,7 +817,9 @@
                         ${alloc.leverage ? '<span class="leverage-badge">2x LEVERAGE</span>' : ''}
                     </td>
                     <td>${alloc.allocation}%</td>
-                    <td>$${alloc.amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td>$${alloc.amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                        ${alloc.leverage ? `<br><span style="color: #D4AF37; font-size: 0.85em;">Exposure: $${alloc.exposure.toLocaleString('en-US', {maximumFractionDigits: 0})}</span>` : ''}
+                    </td>
                     <td>${alloc.return.toFixed(2)}%/yr</td>
                     <td>${alloc.dd.toFixed(2)}%</td>
                 `;
@@ -808,12 +834,18 @@
                 const card = document.createElement('div');
                 card.className = 'bot-detail-card';
                 card.innerHTML = `
-                    <h4>${alloc.name}${alloc.leverage ? ' (2x)' : ''}</h4>
+                    <h4>${alloc.name}${alloc.leverage ? ' (2x Leverage)' : ''}</h4>
                     <div class="stats">
                         <div class="stat-line">
                             <span>Allocation:</span>
                             <span class="value">${alloc.allocation}% ($${alloc.amount.toLocaleString('en-US', {maximumFractionDigits: 0})})</span>
                         </div>
+                        ${alloc.leverage ? `
+                        <div class="stat-line">
+                            <span>Exposure:</span>
+                            <span class="value" style="color: #D4AF37;">$${alloc.exposure.toLocaleString('en-US', {maximumFractionDigits: 0})}</span>
+                        </div>
+                        ` : ''}
                         <div class="stat-line">
                             <span>Annual Return:</span>
                             <span class="value">${alloc.return.toFixed(2)}%</span>
@@ -829,6 +861,10 @@
                         <div class="stat-line">
                             <span>Backtest Period:</span>
                             <span class="value">${alloc.days} days</span>
+                        </div>
+                        <div class="stat-line">
+                            <span>Monthly Contribution:</span>
+                            <span class="value">$${((alloc.amount * (alloc.return / 100)) / 12).toLocaleString('en-US', {maximumFractionDigits: 0})}</span>
                         </div>
                     </div>
                 `;
